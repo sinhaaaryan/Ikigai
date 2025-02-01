@@ -82,17 +82,51 @@ export default function QuestionsScreen() {
     }
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
       setSelectedOptions([]);
     } else {
-      // Only navigate if we have a selected answer
       if (selectedOptions.length > 0) {
-        console.log('Navigating to blank screen');
-        router.push('/blank');
-      } else {
-        console.log('No answer selected');
+        try {
+          const response = await fetch('https://ikigai-r3ag787hv-sinhaaaryans-projects.vercel.app/api/analyze', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              answers: selectedOptions,
+              questions: questions.map(q => q.text)
+            })
+          });
+
+          // Add these debug logs
+          console.log('Response status:', response.status);
+          const responseText = await response.text();
+          console.log('Raw response:', responseText);
+
+          try {
+            const data = JSON.parse(responseText);
+            router.push({
+              pathname: '/blank',
+              params: { analysis: data.analysis }
+            });
+          } catch (parseError) {
+            console.error('JSON Parse error:', parseError);
+            // Fallback navigation with error message
+            router.push({
+              pathname: '/blank',
+              params: { analysis: 'Sorry, there was an error analyzing your responses. Please try again.' }
+            });
+          }
+        } catch (error) {
+          console.error('Network error:', error);
+          // Fallback navigation with error message
+          router.push({
+            pathname: '/blank',
+            params: { analysis: 'Sorry, there was a network error. Please check your connection and try again.' }
+          });
+        }
       }
     }
   };
