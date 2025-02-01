@@ -73,10 +73,7 @@ export default function QuestionsScreen() {
       // For the last question, wait until we have the selection before navigating
       if (currentQuestion === questions.length - 1) {
         setTimeout(() => {
-          router.push({
-            pathname: '/spend',
-            params: { selectedAnswer: optionId }
-          });
+          router.push('/blank');
         }, 500);
       } else {
         // Auto-advance to next question after short delay for non-last questions
@@ -92,16 +89,10 @@ export default function QuestionsScreen() {
     } else {
       // Only navigate if we have a selected answer
       if (selectedOptions.length > 0) {
-        const spendingAnswer = selectedOptions[0];
-        console.log('Sending answer:', spendingAnswer); // Debug log
-        router.push({
-          pathname: '/spend',
-          params: { selectedAnswer: spendingAnswer }
-        });
+        console.log('Navigating to blank screen');
+        router.push('/blank');
       } else {
-        // If no answer selected, either show an alert or set a default
         console.log('No answer selected');
-        // Optionally: Alert.alert('Please select an option');
       }
     }
   };
